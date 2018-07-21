@@ -25,7 +25,6 @@ d = {
     'chemistry': {},
     'medicine': {},
     'literature': {},
-    'peace': {},
     'economic-sciences': {},
 }
 for k, v in d.items():
