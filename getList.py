@@ -13,7 +13,6 @@ from os import mkdir
 from os.path import exists, join
 import urllib.request as request
 import time
-from dateutil.parser import parse
 import re
 
 if not exists('tmp'):
@@ -73,12 +72,11 @@ def list_by_year():
                         a_source = open(a_cache).read()
                         a_soup = BeautifulSoup(a_source, 'html.parser')
                         birth_date = a_soup.find('span', attrs={'itemprop': 'birthDate'}).contents[0]
-                        birth_year = parse(birth_date, fuzzy=True).year
+                        birth_year = int(re.search(r"([1-3][0-9]{3})", birth_date).group(1))
                         award_age = award_year - birth_year
                         work_h2 = a_soup.find('h2', string='Work')
                         if work_h2 is not None:
                             work = work_h2.find_next_sibling().contents[0]
-                            #work_year = parse(work, fuzzy=True).year
                             try:
                                 work_year = int(re.search(r"([1-3][0-9]{3})", work).group(1))
                                 work_age = work_year - birth_year
