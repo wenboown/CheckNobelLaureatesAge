@@ -54,7 +54,7 @@ def list_by_year():
         temp_list = v['soup'].find_all('div', class_="by_year")
 
         with open(k+'.csv', 'w', newline='') as csv_file:
-            fieldnames = ['award_year', 'name', 'birth_date', 'work', 'work_year', 'work_age', 'award_age']
+            fieldnames = ['award_year', 'name', 'birth_date', 'birth_year', 'work', 'work_year', 'work_age', 'award_age', 'number_of_years_in_work']
             writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
             writer.writeheader()
 
@@ -66,7 +66,8 @@ def list_by_year():
                     a_list = i.h6.find_all('a')
                     for aa in a_list:
                         name = aa.contents[0]
-                        a_cache = tmp(aa['href'].split('/')[-1])
+                        link = aa['href'].split('/')
+                        a_cache = tmp(link[-2]+'_'+link[-1])
                         retrieve(base_url+aa['href'], a_cache)
                         a_source = open(a_cache).read()
                         a_soup = BeautifulSoup(a_source, 'html.parser')
@@ -77,22 +78,27 @@ def list_by_year():
                         if work_h2 is not None:
                             work = work_h2.find_next_sibling().contents[0]
                             try:
-                                work_year = max(list(map(int, re.findall(r"([1-3][0-9]{3})", work))))
+                                list_of_years = re.findall(r"([1-3][0-9]{3})", work)
+                                work_year = max(list(map(int, list_of_years)))
                                 work_age = work_year - birth_year
                             except (AttributeError, ValueError):
+                                list_of_years = []
                                 work_year = 0
                                 work_age = 0
                         else:
                             work = ''
+                            list_of_years = []
                             work_year = 0
                             work_age = 0
                         writer.writerow({'award_year': award_year,
                                          'name': name,
                                          'birth_date': birth_date,
+                                         'birth_year': birth_year,
                                          'work': work,
                                          'work_year': work_year,
                                          'work_age': work_age,
-                                         'award_age': award_age})
+                                         'award_age': award_age,
+                                         'number_of_years_in_work': len(list_of_years)})
 
                         print('{} {}'.format(award_year, name))
 
