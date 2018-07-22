@@ -30,7 +30,6 @@ for k, v in d.items():
     v['url'] = '/nobel_prizes/'+k+'/laureates/'
 
 
-
 def tmp(filename):
     return join('tmp', filename)
 
@@ -43,7 +42,7 @@ def extract(cache):
 def retrieve(url, cache):
     if not exists(cache):
         request.urlretrieve(url, cache)
-        #time.sleep(1)  # don't give pressure to their server
+        time.sleep(1)  # slow down the download, don't give pressure to nobelprize.org server
 
 
 def list_by_year():
@@ -78,9 +77,9 @@ def list_by_year():
                         if work_h2 is not None:
                             work = work_h2.find_next_sibling().contents[0]
                             try:
-                                work_year = int(re.search(r"([1-3][0-9]{3})", work).group(1))
+                                work_year = max(list(map(int, re.findall(r"([1-3][0-9]{3})", work))))
                                 work_age = work_year - birth_year
-                            except AttributeError:
+                            except (AttributeError, ValueError):
                                 work_year = 0
                                 work_age = 0
                         else:
